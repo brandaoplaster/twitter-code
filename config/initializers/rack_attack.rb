@@ -3,7 +3,7 @@ module Rack
     Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
 
     # Allow all local traffic
-    safelisrt('allow-localhost') do |req|
+    safelist('allow-localhost') do |req|
       req.ip == '127.0.0.1' || req.ip == '::1'
     end
 
