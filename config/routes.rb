@@ -1,103 +1,17 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
-      get 'follows/create'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'follows/destroy'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'likes/create'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'likes/destroy'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'tweets/index'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'tweets/show'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'tweets/create'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'tweets/destroy'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'tweets/update'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/create'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/destroy'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/update'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/current'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/show'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/following'
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'users/followers'
-    end
-  end
-
-  namespace :api do
-    namespace :v1  do
-      post 'user_token' => 'user_token#create'
+      post 'user_token', to: 'user_token#create'
+      resources :follows, only: %i[create destroy]
+      resources :likes, only: %i[create destroy]
+      resources :tweets, only: %i[index show create update destroy]
+      resources :users, only: %i[show create update destroy] do
+        member do
+          get 'following'
+          get 'followers'
+        end
+        get 'current', on: :collection
+      end
     end
   end
 end
