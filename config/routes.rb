@@ -1,6 +1,18 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      get 'likes/create'
+    end
+  end
+
+  namespace :api do
+    namespace :v1 do
+      get 'likes/destroy'
+    end
+  end
+
+  namespace :api do
+    namespace :v1 do
       get 'tweets/index'
     end
   end
