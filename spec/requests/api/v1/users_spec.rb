@@ -49,7 +49,7 @@ RSpec.describe "Api::V1::Users", type: :request do
   describe 'GET /api/v1/users/current' do
 
     context 'Unauthenticated' do
-      it_behaves_like :deny_wihout_authorization, :get, '/api/v1/users/current'
+      it_behaves_like :deny_without_authorization, :get, '/api/v1/users/current'
     end
 
     context 'Authenticated' do
@@ -89,7 +89,7 @@ RSpec.describe "Api::V1::Users", type: :request do
   describe 'DELETE /api/v1/users/:id' do
 
     context 'Unauthenticated' do
-      it_behaves_like :deny_wihout_authorization, :delete, '/api/v1/users/-1'
+      it_behaves_like :deny_without_authorization, :delete, '/api/v1/users/-1'
     end
 
     context 'Authenticated' do
@@ -163,6 +163,48 @@ RSpec.describe "Api::V1::Users", type: :request do
   end
 
   describe 'PUT /api/v1/users/:id' do
+    context 'Unauthenticated' do
+      it_behaves_like :deny_without_authorization, :put, '/api/v1/users/-1'
+    end
+
+    context 'Authenticated' do
+      context 'resource owner' do
+        context 'valid params' do
+          let(:user) { create(:user) }
+          let(:user_params) { attributes_for(:user) }
+
+          before do
+            put "/api/v1/users/#{user.id}", params: { user: user_params }, headers: header_with_authentication(user)
+          end
+
+          it { expect(response).to have_http_status(:success) }
+
+          it 'returns json with user updated' do
+            expect(json).to include_json(user_params.expect(:password))
+          end
+        end
+
+        context 'invalid params' do
+          let(:user_params) { foo: :bar }
+
+          before {  post '/api/v1/users', params: { user: user_params } }
+
+          it { expect(response).to have_http_status(:unprocessable_entity) }
+        end
+      end
+
+      context 'not resource owner' do
+        let(:user) { create(:user) }
+        let(:other_user) { create(:user) }
+        let(:user_params) { attributes_for(:user) }
+
+        before  do
+          put "/api/v1/users/#{other_user.id}", params: { user: user_params }, headers: header_with_authentication(user)
+        end
+
+        it { expect(response).to have_http_status(:forbidden) }
+      end
+    end
   end
 
   describe 'GET /api/v1/users/:id/following?page=:page' do
