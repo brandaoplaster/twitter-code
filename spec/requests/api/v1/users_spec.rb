@@ -86,6 +86,49 @@ RSpec.describe "Api::V1::Users", type: :request do
   end
 
   describe 'DELETE /api/v1/users/:id' do
+
+    context 'Unauthenticated' do
+      it_behaves_like :deny_wihout_authorization, :delete, '/api/v1/users/-1'
+    end
+
+    context 'Authenticated' do
+      context 'User exists' do
+        context 'Owner of resource' do
+          before { @user = create(:user) }
+
+          it do
+            delete "/api/v1/users/#{@user.id}", headers: header_with_authentication(@user)
+            expect(response).to have_http_status(:not_content)
+          end
+
+          it 'delete user' do
+            expect do
+              delete "/api/v1/users/#{@user.id}", headers: header_with_authentication(@user)
+            end.to change { User.count }.by(-1)
+          end
+        end
+
+        context 'Not resource owner' do
+          let(:uset) { create(:user) }
+          let(:other_user) { create(:user) }
+
+          before do
+            delete "/api/v1/users/#{other_user.id}", headers: header_with_authentication(user)
+          end
+
+          it { expect(response).to have_http_status(:forbidden) }
+        end
+      end
+
+      context 'User dont exist' do
+        let(:user) { create(:user) }
+        let(:user_id) { -1 }
+
+        before { delete "/api/v1/users/#{user_id}", headers: header_with_authentication(user) }
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
+    end
   end
 
   describe 'POST /api/v1/users' do
