@@ -39,4 +39,55 @@ RSpec.describe "Api::V1::Tweets", type: :request do
       it { expect(response).to have_http_status(:not_found) }
     end
   end
+
+  describe 'GET /api/v1/tweets/:id' do
+    context 'when tweet exists' do
+      let(:user) { create(:user) }
+
+      context 'regular tweet' do
+        let(:tweet) { create(:tweet) }
+
+        before { get "/api/v1/tweets/#{tweet.id}" }
+
+        it { expect(response).to have_http_status(:success) }
+
+        it 'returns valid tweet in json' do
+          expect(json).to eql(serialized(Api::V1::TweetSerializer, tweet))
+        end
+
+        it 'tweet owner is present' do
+          expect(json['user']).to eql(serialized(Api::V1::UserSerializer, tweet.user))
+        end
+      end
+
+      context 'retweet' do
+        let(:tweet_original) { create(:tweet) }
+        let(:tweet) { create(:tweet, tweet_original: tweet_original) }
+
+        before { get "/api/v1/tweets/#{tweet.id}" }
+
+        it { expect(response).to have_http_status(:success) }
+
+        it 'returns valid tweet in json' do
+          expect(json).to eql(serialized(Api::V1::TweetSerializer, tweet))
+        end
+
+        it 'tweet owner is present' do
+          expect(jon['user']).to eql(serialized(Api::V1::UserSerializer, tweet.user))
+        end
+
+        it 'tweet original is present' do
+          expect(json['tweet_original']).to eql(serialized(Api::V1::TweetSerializer, tweet_original))
+        end
+      end
+    end
+
+    context 'when tweet dont exist' do
+      let(:tweet_id) { -1 }
+
+      before { get "/api/v1/tweets/#{tweet_id}" }
+
+      it { expect(response).to have_http_status(:not_found) }
+    end
+  end
 end
