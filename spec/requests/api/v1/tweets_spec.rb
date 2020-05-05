@@ -93,7 +93,7 @@ RSpec.describe "Api::V1::Tweets", type: :request do
 
   context 'DELETE /api/v1/tweets/:tweet_id' do
     context 'unauthenticated' do
-      it_behaves_like :deny_without_authorization, :delte, '/api/v1/users/-1'
+      it_behaves_like :deny_without_authorization, :delete, '/api/v1/tweets/-1'
     end
 
     context 'authenticated' do
@@ -121,6 +121,42 @@ RSpec.describe "Api::V1::Tweets", type: :request do
 
         before do
           delete "/api/v1/tweets/#{tweet.id}", headers: header_with_authentication(user)
+        end
+
+        it { expect(response).to have_http_status(:forbidden) }
+      end
+    end
+  end
+
+  context 'PUT /api/v1/tweets/:tweet_id' do
+    context 'unauthenticated' do
+      it_behaves_like :deny_witout_authorization, :put '/api/tweets/-1'
+    end
+
+    context 'authenticated' do
+      context 'resoure owner' do
+        let(:user) { create(:user) }
+        let(:tweet) { create(:tweet, user: user) }
+        let(:tweet_params) { attributes_for(:tweet) }
+
+        before { put "/api/v1/tweets/#{tweet.id}", params: { tweet: tweet_params }, headers: header_with_authentication(user) }
+
+        it { expect(response).to have_http_status(:success) }
+
+        it 'returns tweet updated in json' do
+          post '/api/v1/tweets/', params: { tweet: tweet_params }, headers: header_with_authentication(user)
+          expect(json).to include_json(tweet_params)
+        end
+      end
+
+      context 'not resource owner' do
+        let(:user) { create(:user) }
+        let(:other_user) { create(:user) }
+        let(:tweet) { create(:tweet, user: other_user) }
+        let(:tweet_params) { attributes_for(:tweet) }
+
+        before do
+          put "/api/v1/tweets/#{tweet.id}", params: { tweet: tweet_params }, headers: header_with_authentication(user)
         end
 
         it { expect(response).to have_http_status(:forbidden) }
