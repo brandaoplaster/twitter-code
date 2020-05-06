@@ -18,6 +18,11 @@ module Api
       end
 
       def update
+        if @user.update(user_params)
+          render json: @user
+        else
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+        end
       end
 
       def current
