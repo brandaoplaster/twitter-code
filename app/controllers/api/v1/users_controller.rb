@@ -15,6 +15,7 @@ module Api
       end
 
       def destroy
+        @user.destroy
       end
 
       def update
@@ -26,9 +27,11 @@ module Api
       end
 
       def current
+        render json: current_user
       end
 
       def show
+        render json: @user
       end
 
       def following
