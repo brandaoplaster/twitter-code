@@ -35,6 +35,8 @@ module Api
       end
 
       def following
+        @following = @user.following_users.paginate(page: @page)
+        render json: @following
       end
 
       def followers
