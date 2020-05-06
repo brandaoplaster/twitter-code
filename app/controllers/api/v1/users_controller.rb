@@ -1,22 +1,44 @@
-class Api::V1::UsersController < ApplicationController
-  def create
-  end
+module Api
+  module V1
+    class UsersController < Api::V1::ApiController
+      before_action :authenticate_user, only: %i[current update destroy]
+      before_action :set_user, only: %i[show destroy update following followers]
+      before_action :set_page except: %i[follwers following create]
 
-  def destroy
-  end
+      def create
+      end
 
-  def update
-  end
+      def destroy
+      end
 
-  def current
-  end
+      def update
+      end
 
-  def show
-  end
+      def current
+      end
 
-  def following
-  end
+      def show
+      end
 
-  def followers
+      def following
+      end
+
+      def followers
+      end
+
+      private
+
+      def user_params
+        params.require(:user).permit(:name, :email, :password, :password_confirmation)
+      end
+
+      def set_user
+        @user = User.find(params[:id])
+      end
+
+      def set_page
+        @page = params['page'] || 1
+      end
+    end
   end
 end
