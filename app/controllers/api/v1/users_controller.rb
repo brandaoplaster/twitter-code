@@ -3,7 +3,7 @@ module Api
     class UsersController < Api::V1::ApiController
       before_action :authenticate_user, only: %i[current update destroy]
       before_action :set_user, only: %i[show destroy update following followers]
-      before_action :set_page except: %i[follwers following create]
+      before_action :set_page, only: %i[show followers following]
 
       def create
         user = User.new(user_params)
