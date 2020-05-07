@@ -40,6 +40,8 @@ module Api
       end
 
       def followers
+        @followers = @user.followers_by_type('User').paginate(page: @page)
+        render json: @followers
       end
 
       private
