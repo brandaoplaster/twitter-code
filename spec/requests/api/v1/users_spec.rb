@@ -154,7 +154,7 @@ RSpec.describe "Api::V1::Users", type: :request do
     end
 
     context 'Invalid params' do
-      let(:user_params) { foo: :bar }
+      let(:user_params) { { foo: :bar } }
 
       before { post '/api/v1/users', params: { user: user_params } }
 
@@ -185,7 +185,7 @@ RSpec.describe "Api::V1::Users", type: :request do
         end
 
         context 'invalid params' do
-          let(:user_params) { foo: :bar }
+          let(:user_params) { { foo: :bar } }
 
           before {  post '/api/v1/users', params: { user: user_params } }
 
