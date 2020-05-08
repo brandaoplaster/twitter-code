@@ -1,11 +1,18 @@
 module Api
   module V1
     class TweetsController < Api::V1::ApiController
+      before_action :set_tweet, except: %i[create index]
+      before_action :authenticate_user, except: [:show]
+      load_and_authorize_resource except: %i[index show create]
+
       def index
+        user User.find(params[:user_id])
+        @tweets = user.tweets.paginate(page: params[:page] || 1)
+        render json: @tweets
       end
 
       def show
-        render json: @tweetm include: '**'
+        render json: @tweet, include: '**'
       end
 
       def create
