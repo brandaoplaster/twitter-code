@@ -30,6 +30,11 @@ module Api
       end
 
       def update
+        if @tweet.update(tweet_params.merge(user: current_user))
+          render json: @tweet
+        else
+          render json: { errors: @tweet.errors.full_messages }, status: :unprocessable_entity
+        end
       end
 
       private
