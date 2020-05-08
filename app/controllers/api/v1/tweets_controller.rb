@@ -5,12 +5,14 @@ module Api
       end
 
       def show
+        render json: @tweetm include: '**'
       end
 
       def create
       end
 
       def destroy
+        @tweet.destroy
       end
 
       def update
