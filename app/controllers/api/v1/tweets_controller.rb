@@ -9,6 +9,13 @@ module Api
       end
 
       def create
+        @tweet = Tweet.new(tweet_params.merge(user: current_user))
+
+        if @tweet.save
+          render json: @tweet, status: :created
+        else
+          render json: { errors: @tweet.errors.full_messages }, status: :unprocessable_entity
+        end
       end
 
       def destroy
