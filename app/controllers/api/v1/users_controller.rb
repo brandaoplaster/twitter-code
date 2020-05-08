@@ -4,6 +4,7 @@ module Api
       before_action :authenticate_user, only: %i[current update destroy]
       before_action :set_user, only: %i[show destroy update following followers]
       before_action :set_page, only: %i[show followers following]
+      load_and_authorize_resource except: %i[followers following create]
 
       def create
         user = User.new(user_params)
