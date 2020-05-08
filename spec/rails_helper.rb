@@ -46,7 +46,7 @@ RSpec.configure do |config|
   # custom helpers
   config.include Requests::JsonHelpers, type: :request
   config.include Requests::HeaderHelpers, type: :request
-  config.include Requests::SerialzerHelpers, type: :request
+  config.include Requests::SerializerHelpers, type: :request
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and

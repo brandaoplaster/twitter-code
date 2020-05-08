@@ -2,8 +2,7 @@ require 'rails_helper'
 require 'rspec/json_expectations'
 
 RSpec.describe "Api::V1::Users", type: :request do
-  describe "GET /api/v1/users/:id" do
-
+  describe 'GET /api/v1/users/:id' do
     context 'when user exists' do
       let(:user) { create(:user) }
       let(:following_number) { Random.rand(9) }
@@ -20,11 +19,11 @@ RSpec.describe "Api::V1::Users", type: :request do
 
       it { expect(response).to have_http_status(:success) }
 
-      it 'Returns valid user in json' do
-        expect(json).to eql(serizlized(Api::V1::UserSerializer, user))
+      it 'returns valid user in json' do
+        expect(json).to eql(serialized(Api::V1::UserSerializer, user))
       end
 
-      it 'Right followers number' do
+      it 'right followers number' do
         expect(json['followers_count']).to eql(followers_number)
       end
 
@@ -32,22 +31,21 @@ RSpec.describe "Api::V1::Users", type: :request do
         expect(json['following_count']).to eql(following_number)
       end
 
-      it 'Right tweets number' do
-        expect(json['tweet_count']).to eql(tweet_number)
+      it 'right tweets number' do
+        expect(json['tweets_count']).to eql(tweet_number)
       end
     end
 
     context 'when user dont exist' do
       let(:user_id) { -1 }
 
-      before { get "/api/v1/users/#{user_is}" }
+      before { get "/api/v1/users/#{user_id}" }
 
       it { expect(response).to have_http_status(:not_found) }
     end
   end
 
   describe 'GET /api/v1/users/current' do
-
     context 'Unauthenticated' do
       it_behaves_like :deny_without_authorization, :get, '/api/v1/users/current'
     end
@@ -68,38 +66,37 @@ RSpec.describe "Api::V1::Users", type: :request do
 
       it { expect(response).to have_http_status(:success) }
 
-      it 'Returns valid user is json' do
+      it 'returns valid user in json' do
         expect(json).to eql(serialized(Api::V1::UserSerializer, user))
       end
 
-      it 'Right followers number' do
+      it 'right followers number' do
         expect(json['followers_count']).to eql(followers_number)
       end
 
-      it 'Right following number' do
-        expect(json['following_number']).to eql(following_number)
+      it 'right following number' do
+        expect(json['following_count']).to eql(following_number)
       end
 
-      it 'Right tweet number' do
+      it 'right tweets number' do
         expect(json['tweets_count']).to eql(tweet_number)
       end
     end
   end
 
   describe 'DELETE /api/v1/users/:id' do
-
-    context 'Unauthenticated' do
+    context 'unauthenticated' do
       it_behaves_like :deny_without_authorization, :delete, '/api/v1/users/-1'
     end
 
-    context 'Authenticated' do
-      context 'User exists' do
-        context 'Owner of resource' do
+    context 'authenticated' do
+      context 'user exists' do
+        context 'owner of resource' do
           before { @user = create(:user) }
 
           it do
             delete "/api/v1/users/#{@user.id}", headers: header_with_authentication(@user)
-            expect(response).to have_http_status(:not_content)
+            expect(response).to have_http_status(:no_content)
           end
 
           it 'delete user' do
@@ -109,8 +106,9 @@ RSpec.describe "Api::V1::Users", type: :request do
           end
         end
 
-        context 'Not resource owner' do
-          let(:uset) { create(:user) }
+        context 'not resource owner' do
+          let(:user) { create(:user) }
+
           let(:other_user) { create(:user) }
 
           before do
@@ -121,7 +119,7 @@ RSpec.describe "Api::V1::Users", type: :request do
         end
       end
 
-      context 'User dont exist' do
+      context 'user dont exist' do
         let(:user) { create(:user) }
         let(:user_id) { -1 }
 
@@ -137,13 +135,13 @@ RSpec.describe "Api::V1::Users", type: :request do
       let(:user_params) { attributes_for(:user) }
 
       it 'return created' do
-        post '/api/v1/users', params: { user: user_params }
+        post '/api/v1/users/', params: { user: user_params }
         expect(response).to have_http_status(:created)
       end
 
       it 'returns right user in json' do
-        post '/api/v1/users', params: { user: user_params }
-        expect(json).to include_json(user_params.expect(:password))
+        post '/api/v1/users/', params: { user: user_params }
+        expect(json).to include_json(user_params.except(:password))
       end
 
       it 'create user' do
@@ -153,10 +151,10 @@ RSpec.describe "Api::V1::Users", type: :request do
       end
     end
 
-    context 'Invalid params' do
-      let(:user_params) { foo: :bar }
+    context 'invalid params' do
+      let(:user_params) { {foo: :bar} }
 
-      before { post '/api/v1/users', params: { user: user_params } }
+      before { post '/api/v1/users/', params: { user: user_params } }
 
       it { expect(response).to have_http_status(:unprocessable_entity) }
     end
@@ -167,7 +165,7 @@ RSpec.describe "Api::V1::Users", type: :request do
       it_behaves_like :deny_without_authorization, :put, '/api/v1/users/-1'
     end
 
-    context 'Authenticated' do
+    context 'authenticated' do
       context 'resource owner' do
         context 'valid params' do
           let(:user) { create(:user) }
@@ -180,25 +178,25 @@ RSpec.describe "Api::V1::Users", type: :request do
           it { expect(response).to have_http_status(:success) }
 
           it 'returns json with user updated' do
-            expect(json).to include_json(user_params.expect(:password))
+            expect(json).to include_json(user_params.except(:password))
           end
         end
 
-        context 'invalid params' do
-          let(:user_params) { foo: :bar }
+        context 'Invalid params' do
+          let(:user_params) { {foo: :bar} }
 
-          before {  post '/api/v1/users', params: { user: user_params } }
+          before { post '/api/v1/users/', params: { user: user_params } }
 
           it { expect(response).to have_http_status(:unprocessable_entity) }
         end
       end
 
-      context 'not resource owner' do
+      context 'Not resource owner' do
         let(:user) { create(:user) }
         let(:other_user) { create(:user) }
         let(:user_params) { attributes_for(:user) }
 
-        before  do
+        before do
           put "/api/v1/users/#{other_user.id}", params: { user: user_params }, headers: header_with_authentication(user)
         end
 
@@ -221,15 +219,16 @@ RSpec.describe "Api::V1::Users", type: :request do
 
       it 'returns right following' do
         get "/api/v1/users/#{user.id}/following?page=1"
+
         expect(json).to eql(each_serialized(Api::V1::UserSerializer, user.following_users[0..14]))
       end
 
-      it 'returns 15 elements on first page' do
+      it 'returns 15 elemments on first page' do
         get "/api/v1/users/#{user.id}/following?page=1"
         expect(json.count).to eql(15)
       end
 
-      it 'returns remaining elements on second page' do
+      it 'returns remaining elemments on second page' do
         get "/api/v1/users/#{user.id}/following?page=2"
         remaining = user.following_users.count - 15
         expect(json.count).to eql(remaining)
@@ -253,7 +252,7 @@ RSpec.describe "Api::V1::Users", type: :request do
       before { followers_number.times { create(:user).follow(user) } }
 
       it do
-        get "/api/users/#{user.id}/followers?page=1"
+        get "/api/v1/users/#{user.id}/followers?page=1"
         expect(response).to have_http_status(:success)
       end
 
@@ -262,12 +261,12 @@ RSpec.describe "Api::V1::Users", type: :request do
         expect(json).to eql(each_serialized(Api::V1::UserSerializer, user.followers[0..14]))
       end
 
-      it 'returns 15 elements on first page' do
+      it 'returns 15 elemments on first page' do
         get "/api/v1/users/#{user.id}/followers?page=1"
         expect(json.count).to eql(15)
       end
 
-      it 'returns remaining elements on second page' do
+      it 'returns remaining elemments on second page' do
         get "/api/v1/users/#{user.id}/followers?page=2"
         remaining = user.followers.count - 15
         expect(json.count).to eql(remaining)
