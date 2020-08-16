@@ -1,6 +1,6 @@
 module Api
   module V1
-    class FollowsController < Api::V1::ApiController # >
+    class FollowsController < Api::V1::ApiController
       before_action :set_user
       before_action :authenticate_user
  

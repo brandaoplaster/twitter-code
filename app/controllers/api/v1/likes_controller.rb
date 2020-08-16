@@ -1,6 +1,6 @@
 module Api
   module V1
-    class LikesController < Api::V1::ApiController # >
+    class LikesController < Api::V1::ApiController
       before_action :set_tweet
       before_action :authenticate_user
  
@@ -13,7 +13,7 @@ module Api
       end
  
       def destroy
-        current_user.dislikes @tweet
+        @tweet.unliked_by current_user
       end
  
       private
