@@ -1,8 +1,8 @@
-FROM ruby:2.5.1-slim
+FROM ruby:2.6.6
 
 # Install dependencies
 RUN apt-get update && apt-get install -qq -y --no-install-recommends \
-    build-essential nodejs libpq-dev imagemagick git-all
+build-essential nodejs libpq-dev imagemagick git-all
 
 # Set path
 ENV INSTALL_PATH /twitter-code
